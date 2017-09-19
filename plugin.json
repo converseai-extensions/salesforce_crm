@@ -1,0 +1,273 @@
+{
+  "name": "salesforce_crm",
+  "displayName": "Salesforce",
+  "description": "Plugin for CRUD and query actions for Salesforce",
+  "category": "CRM",
+  "documentLink": "https://get.converse.ai/v2/docs/salesforce",
+  "hasOAuth": true,
+  "needsOAuth": false,
+  "providerData": [
+    {
+      "param": "app",
+      "displayName": "Connected App",
+      "description": "The details of the connected app to be used for authentication. If you do not supply this information then the default converse app will be used.",
+      "type": "PARAM",
+      "optional": false,
+      "valueParams": [
+        {
+          "param": "client_id",
+          "displayName": "Client Id",
+          "description": "The client id of the connected app",
+          "type": "STRING",
+          "optional": false
+        },
+        {
+          "param": "client_secret",
+          "displayName": "Client Secret",
+          "description": "The client secret of the connected app",
+          "type": "PASSWORD",
+          "optional": false
+        }
+      ]
+    },
+    {
+      "param": "oauth",
+      "displayName": "OAuth Callback",
+      "description": "Settings for customising the OAuth process for the end user.",
+      "type": "PARAM",
+      "optional": true,
+      "valueParams": [
+        {
+          "param": "start_message",
+          "displayName": "Message",
+          "description": "Message to be displayed along with the OAuth redirect link when asking the user to start the OAuth process",
+          "type": "STRING",
+          "optional": true
+        },
+        {
+          "param": "redirect_url",
+          "displayName": "Redirect Url",
+          "description": "A URl to redirect the user to after OAuth callback",
+          "type": "STRING",
+          "optional": true
+        },
+        {
+          "param": "redirect_message",
+          "displayName": "Redirect Message",
+          "description": "A message to display after OAuth callback to inform them to return to the conversation",
+          "type": "STRING",
+          "optional": true
+        }
+      ]
+    }
+  ],
+  "module": [
+    {
+      "id": "query",
+      "name": "Query",
+      "description": "Return a list of records that match the specified query.",
+      "hasReturn": true,
+      "param": [
+        {
+          "param": "table_name",
+          "displayName": "Record Name",
+          "description": "The name of the record table.",
+          "type": "STRING"
+        },
+        {
+          "param": "start_index",
+          "displayName": "Start Index",
+          "description": "The starting index of the returned results. Defaults to 0.",
+          "type": "STRING",
+          "optional": true
+        },
+        {
+          "param": "max_results",
+          "displayName": "Max Results",
+          "description": "The maximum number of results that should be returned. Defaults to 10.",
+          "type": "STRING",
+          "optional": true
+        },
+        {
+          "param": "columns",
+          "displayName": "Columns",
+          "description": "The names of the columns that should be returned for each record.",
+          "type": "STRING",
+          "allowArray": true,
+          "minItems": 0
+        },
+        {
+          "param": "query",
+          "displayName": "Query",
+          "description": "Query parameters that can be used to filter the returned results.",
+          "type": "PARAM",
+          "allowArray": true,
+          "optional": true,
+          "valueParams": [
+            {
+              "param": "type",
+              "displayName": "Type",
+              "description": "Specify the column type that is being queried.",
+              "type": "ENUM",
+              "value": [
+                {
+                  "label": "String",
+                  "value": "STRING"
+                },
+                {
+                  "label": "Boolean",
+                  "value": "BOOL"
+                },
+                {
+                  "label": "Number",
+                  "value": "NUMBER"
+                }
+              ]
+            },
+            {
+              "param": "column",
+              "displayName": "Column",
+              "description": "The name of the column to be queried.",
+              "type": "STRING"
+            },
+            {
+              "param": "condition",
+              "displayName": "Condition",
+              "description": "The condition to be applied to the column.",
+              "type": "ENUM",
+              "allowArray": false,
+              "value": [
+                {
+                  "label": "Equals",
+                  "value": "IS_EQUAL_TO"
+                },
+                {
+                  "label": "Not Equals",
+                  "value": "IS_NOT_EQUAL_TO"
+                },
+                {
+                  "label": "In",
+                  "value": "IS_IN"
+                },
+                {
+                  "label": "Not In",
+                  "value": "IS_NOT_IN"
+                },
+                {
+                  "label": "Less Than",
+                  "value": "IS_LESS_THAN"
+                },
+                {
+                  "label": "Less Than or Equal To",
+                  "value": "IS_LESS_THAN_OR_EQUAL"
+                },
+                {
+                  "label": "Greater Than",
+                  "value": "IS_GREATER_THAN"
+                },
+                {
+                  "label": "Greater Than or Equal To",
+                  "value": "IS_GREATER_THAN_OR_EQUAL"
+                }
+              ]
+            },
+            {
+              "param": "value",
+              "displayName": "Value",
+              "description": "The value, or values, to be used to compare to the column with the condition.",
+              "type": "STRING",
+              "allowArray": true,
+              "minItems": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "create",
+      "name": "Create",
+      "description": "Create a new record in the specified record table.",
+      "hasReturn": true,
+      "param": [
+        {
+          "param": "table_name",
+          "displayName": "Record Name",
+          "description": "The name of the record table.",
+          "type": "STRING"
+        },
+        {
+          "param": "entries",
+          "displayName": "Entries",
+          "description": "The name and values of the record values that will be set on create.",
+          "type": "MAP"
+        }
+      ]
+    },
+    {
+      "id": "retrieve",
+      "name": "Retrieve",
+      "description": "Retrieve a complete record from the specified record table.",
+      "hasReturn": true,
+      "param": [
+        {
+          "param": "table_name",
+          "displayName": "Record Name",
+          "description": "The name of the record table.",
+          "type": "STRING"
+        },
+        {
+          "param": "record_id",
+          "displayName": "Id",
+          "description": "The unique Id of the record",
+          "type": "STRING"
+        }
+      ]
+    },
+    {
+      "id": "update",
+      "name": "Update",
+      "description": "Update an existing record in the specified record table.",
+      "hasReturn": true,
+      "param": [
+        {
+          "param": "table_name",
+          "displayName": "Record Name",
+          "description": "The name of the record table.",
+          "type": "STRING"
+        },
+        {
+          "param": "record_id",
+          "displayName": "Id",
+          "description": "The unique Id of the record",
+          "type": "STRING"
+        },
+        {
+          "param": "entries",
+          "displayName": "Entries",
+          "description": "The name and values of the record values that will be updated.",
+          "type": "MAP"
+        }
+      ]
+    },
+    {
+      "id": "deletefn",
+      "name": "Delete",
+      "description": "Delete a record from the specified record table.",
+      "hasReturn": true,
+      "param": [
+        {
+          "param": "table_name",
+          "displayName": "Record Name",
+          "description": "The name of the record table.",
+          "type": "STRING"
+        },
+        {
+          "param": "record_id",
+          "displayName": "Id",
+          "description": "The unique Id of the record",
+          "type": "STRING"
+        }
+      ]
+    }
+  ]
+}

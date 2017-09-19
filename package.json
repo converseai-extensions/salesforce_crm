@@ -1,0 +1,20 @@
+{
+  "name": "jsforce",
+  "description": "",
+  "main": "plugin.js",
+  "author": "ConverseAI",
+  "scripts": {
+    "test": "mocha test/plugin-test.js 'test/**/*-test.js'"
+  },
+  "dependencies": {
+    "@converseai/plugins-sdk": "latest",
+    "jsforce": "latest"
+  },
+  "devDependencies": {
+    "body-parser": "latest",
+    "chai": "latest",
+    "express": "latest",
+    "mocha": "latest",
+    "supertest": "latest"
+  }
+}
