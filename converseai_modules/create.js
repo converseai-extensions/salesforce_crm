@@ -27,16 +27,30 @@ module.exports = function create(app, body) {
     return;
   }
 
-  var oauthToken = body.payload.invokerOAuth;
-  if (!oauthToken) {
-    app.send(Status.NEED_AUTH, null);
-    return;
+  var oauthToken = null;
+
+  if (moduleParam.useProviderOAuth) {
+    oauthToken = body.payload.providerOAuth;
+    if (!oauthToken) {
+      app.send(Status.FAIL, new ErrorResponse(400, "INTERNAL", "Needs valid provider plugin authentication"));
+      return;
+    }
+  } else {
+    oauthToken = body.payload.invokerOAuth;
+    if (!oauthToken) {
+      app.send(Status.NEED_AUTH, null);
+      return;
+    }
   }
 
   var conn = Utils.createConnection(oauthToken, body);
   if (conn.error != null) {
     if (conn.needAuth) {
-      app.send(Status.NEED_AUTH, null);
+      if (moduleParam.useProviderOAuth) {
+        app.send(Status.FAIL, new ErrorResponse(400, "INTERNAL", "Needs valid provider plugin authentication"));
+      } else {
+        app.send(Status.NEED_AUTH, null);
+      }
       return;
     }
     app.send(Status.FAIL, new ErrorResponse(400, "INTERNAL", conn.error));

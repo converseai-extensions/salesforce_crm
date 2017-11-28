@@ -14,23 +14,29 @@ const OAuth2HandleCodeResponse = require('@converseai/plugins-sdk').Payloads.OAu
 const ErrorResponse = require('@converseai/plugins-sdk').Payloads.ErrorResponse;
 const Utils = require('./lib/utils.js');
 
+const OAUTH_USER = 0;
+const OAUTH_PROVIDER = 1;
+
 /**
  * Triggers the OAuth2 process.
  */
 var onOAuthStart = function(app, body) {
 
   var oauth2Uri = "https://login.salesforce.com/services/oauth2/authorize";
-
-  var response = new OAuth2SetupDataResponse();
+  var registrationData = body.payload.registrationData;
 
   var clientId = Utils.getClientId(body);
 
+  var response = new OAuth2SetupDataResponse();
   response.setOAuth2URI(oauth2Uri);
   response.setClientID(clientId);
   response.setScope("full refresh_token offline_access");
   response.setState("");
-  if (body.payload.registrationData.oauth) {
-    response.setComment(body.payload.registrationData.oauth.start_message);
+  if (body.payload.oauthType === OAUTH_PROVIDER) {
+    console.log("onOAuthStart for provider");
+    response.setComment("");
+  } else if (registrationData.oauth && registrationData.oauth.start_message) {
+    response.setComment(registrationData.oauth.start_message);
   }
   response.setExtraParams(null);
 
@@ -42,6 +48,10 @@ var onOAuthHandleCode = function(app, body) {
   if (body.isTest) {
     app.send(Status.SUCCESS, null);
     return
+  }
+
+  if (body.payload.oauthType === OAUTH_PROVIDER) {
+    console.log("onOAuthHandleCode for provider");
   }
 
   var code = body.payload.code;
@@ -74,14 +84,18 @@ var onOAuthHandleCode = function(app, body) {
       });
     }
 
-    response.setMessage("Please return to your conversation");
-    if (body.payload.registrationData.oauth) {
-      if (body.payload.registrationData.oauth.redirect_url) {
-        response.setMessage("");
-        response.setRedirectURL(body.payload.registrationData.oauth.redirect_url);
-      } else if (body.payload.registrationData.oauth.redirect_message) {
-        response.setMessage(body.payload.registrationData.oauth.redirect_message);
+    if (body.payload.oauthType === OAUTH_USER) {
+      response.setMessage("Please return to your conversation");
+      if (body.payload.registrationData.oauth) {
+        if (body.payload.registrationData.oauth.redirect_url) {
+          response.setMessage("");
+          response.setRedirectURL(body.payload.registrationData.oauth.redirect_url);
+        } else if (body.payload.registrationData.oauth.redirect_message) {
+          response.setMessage(body.payload.registrationData.oauth.redirect_message);
+        }
       }
+    } else {
+      response.setMessage("Authentication successful");
     }
 
     app.send(Status.SUCCESS, response);

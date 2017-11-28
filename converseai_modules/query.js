@@ -15,24 +15,26 @@ const Utils = require('../lib/utils.js');
 
 module.exports = function query(app, body) {
 
-  var startIndex = body.payload.moduleParam.start_index;
+  var moduleParam = body.payload.moduleParam;
+
+  var startIndex = moduleParam.start_index;
   if (!startIndex) {
     startIndex = "0";
   }
 
-  var maxResults = body.payload.moduleParam.max_results;
+  var maxResults = moduleParam.max_results;
   if (!maxResults) {
     maxResults = "10";
   }
 
-  var tableName = body.payload.moduleParam.table_name;
+  var tableName = moduleParam.table_name;
   if (!tableName) {
     app.send(Status.FAIL, new ErrorResponse(400, "INTERNAL", "No record name has been specified"));
     return;
   }
 
   var columnsString = "Id";
-  var columns = body.payload.moduleParam.columns;
+  var columns = moduleParam.columns;
 
   if (columns && columns.length > 0) {
 
@@ -48,16 +50,30 @@ module.exports = function query(app, body) {
     }
   }
 
-  var oauthToken = body.payload.invokerOAuth;
-  if (!oauthToken) {
-    app.send(Status.NEED_AUTH, null);
-    return;
+  var oauthToken = null;
+
+  if (moduleParam.useProviderOAuth) {
+    oauthToken = body.payload.providerOAuth;
+    if (!oauthToken) {
+      app.send(Status.FAIL, new ErrorResponse(400, "INTERNAL", "Needs valid provider plugin authentication"));
+      return;
+    }
+  } else {
+    oauthToken = body.payload.invokerOAuth;
+    if (!oauthToken) {
+      app.send(Status.NEED_AUTH, null);
+      return;
+    }
   }
 
   var conn = Utils.createConnection(oauthToken, body);
   if (conn.error != null) {
     if (conn.needAuth) {
-      app.send(Status.NEED_AUTH, null);
+      if (moduleParam.useProviderOAuth) {
+        app.send(Status.FAIL, new ErrorResponse(400, "INTERNAL", "Needs valid provider plugin authentication"));
+      } else {
+        app.send(Status.NEED_AUTH, null);
+      }
       return;
     }
     app.send(Status.FAIL, new ErrorResponse(400, "INTERNAL", conn.error));
@@ -65,7 +81,7 @@ module.exports = function query(app, body) {
   }
 
   var whereCondition = "";
-  var conditions = body.payload.moduleParam.query;
+  var conditions = moduleParam.query;
   if (conditions && conditions.length > 0) {
     whereCondition = " WHERE ";
 
