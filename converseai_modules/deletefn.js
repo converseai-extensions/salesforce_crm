@@ -14,6 +14,8 @@ const ErrorResponse = require('@converseai/plugins-sdk').Payloads.ErrorResponse;
 const Utils = require('../lib/utils.js');
 
 module.exports = function deletefn(app, body) {
+  
+  var moduleParam = body.payload.moduleParam;
 
   var tableName = body.payload.moduleParam.table_name;
   if (!tableName) {

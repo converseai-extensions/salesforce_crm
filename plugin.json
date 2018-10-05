@@ -4,6 +4,7 @@
   "description": "Plugin for CRUD and query actions for Salesforce",
   "category": "CRM",
   "documentLink": "https://get.converse.ai/v2/docs/salesforce",
+  "logoName": "salesforce_crm.png",
   "hasOAuth": true,
   "needsOAuth": false,
   "uiSpec": {

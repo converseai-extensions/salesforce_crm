@@ -16,6 +16,8 @@ const Utils = require('../lib/utils.js');
 
 module.exports = function update(app, body) {
 
+  var moduleParam = body.payload.moduleParam;
+
   var tableName = body.payload.moduleParam.table_name;
   if (!tableName) {
     app.send(Status.FAIL, new ErrorResponse(400, "INTERNAL", "No record name has been specified"));

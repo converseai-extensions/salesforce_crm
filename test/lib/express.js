@@ -1,6 +1,6 @@
 /**
  * @file test/lib/express.js
- * @author scott@converse.ai
+ * @author scott.mcgowan@smartsheet.com
  *
  * A quick express server example of starting a server and passing the request
  * and response to the generated converse plugin `plugin.js`
